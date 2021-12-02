@@ -1,6 +1,9 @@
 # BTCAggr
 
-![screenshot](https://i.imgur.com/4GOMOSP.png)
+![screenshot](https://i.imgur.com/ugVbqVB.png)
 
-# Description
-Bitcoin trade aggregator that collects trading data from multiple exchanges.
+## Description
+
+Bitcoin market trade aggregator.
+
+Currently supports Binance, Binance Futures, FTX, FTX Futures, Coinbase, and Kraken.  
