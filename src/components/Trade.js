@@ -20,6 +20,7 @@ function Trade(){
 		axios.get('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=20')
 		.then(async response => {
 			var data = []
+			var price = 0
 			await response.data.map(c => {
 					data.push({
 						open: parseInt(Number(c[1]).toFixed(0)),
@@ -28,8 +29,10 @@ function Trade(){
 						low: parseInt(Number(c[3]).toFixed(0)),
 						time: c[0]/1000
 					})
+					price = parseInt(Number(c[4]).toFixed(0))
 			})
 			setCandles(data)
+			setPrice(price)
 		}).catch(error =>{
 			console.log(error)
 		})			
@@ -78,8 +81,8 @@ function Trade(){
     return(
         <View>
 			<View>
-				<Text style={[styles.textColor, styles.header]}>Bitcoin</Text>
-				<Text style={[styles.textColor, styles.header]}>${price}</Text>
+				<Text style={[styles.textColor, styles.headerText]}>Bitcoin</Text>
+				<Text style={[styles.textColor, styles.headerText]}>${price}</Text>
 			</View>
 			<Chart {...{ candles, domain }} />
 			<Table/>
@@ -88,17 +91,17 @@ function Trade(){
 }
 
 const styles = StyleSheet.create({
-	container:{
-		flex: 1
-	},
 	textColor: {
 		color: "#D1D5DB"
 	},
-	header: {
+	headerText: {
 		fontSize: 20,
 		fontWeight: 'bold',
 		marginBottom: 5,
-		textAlign: 'center'
+		textAlign: 'center',
+	},
+	chart:{
+		backgroundColor: "#111827",
 	},
 })
 

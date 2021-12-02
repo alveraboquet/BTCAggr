@@ -75,18 +75,20 @@ function Table(){
         ftxSpotWS.onmessage = (event) => {
             let data = JSON.parse(event.data)
             if (data.hasOwnProperty('data')){
+                var arr = []
                 data.data.map(d => {
                     var total = d.size * d.price
                     if (total > 50000){
-                        setTrades(oldArray => {
-                            if (oldArray.length > arrLength){
-                                oldArray.splice(0,25)
-                            }
-                            return [{
-                                exchange: "ftx",time: new Date(d.time).getTime(), type: d.side.toUpperCase(), buysell: d.side === "buy" ? true : false, 
-                                quantity: d.size, total: formatTotal(total), price: d.price}, ...oldArray]
-                        })
+                        arr = [{
+                            exchange: "ftx",time: new Date(d.time).getTime(), type: d.side.toUpperCase(), buysell: d.side === "buy" ? true : false, 
+                            quantity: d.size, total: formatTotal(total), price: d.price}, ...arr]
                     }
+                })
+                setTrades(oldArray => {
+                    if (oldArray.length > arrLength){
+                        oldArray.splice(0,25)
+                    }
+                    return [...arr, ...oldArray]
                 })
             }
         }
@@ -103,18 +105,19 @@ function Table(){
         ftxFuturesWS.onmessage = (event) => {
             let data = JSON.parse(event.data)
             if (data.hasOwnProperty('data')){
+                var arr = []
                 data.data.map(d => {
                     var total = d.size * d.price
                     if (total > 50000){
-                        setTrades(oldArray => {
-                            if (oldArray.length > arrLength){
-                                oldArray.splice(0,25)
-                            }
-                            return [{
-                                exchange: "ftx",time: new Date(d.time).getTime(), type: d.side.toUpperCase(), buysell: d.side === "buy" ? true : false, 
-                                quantity: d.size, total: formatTotal(total), price: d.price}, ...oldArray]
-                        })
+                        arr = [{exchange: "ftx",time: new Date(d.time).getTime(), type: d.side.toUpperCase(), 
+                            buysell: d.side === "buy" ? true : false, quantity: d.size, total: formatTotal(total), price: d.price}, ...arr]
                     }
+                })
+                setTrades(oldArray => {
+                    if (oldArray.length > arrLength){
+                        oldArray.splice(0,25)
+                    }
+                    return [...arr, ...oldArray]
                 })
             }
         }
@@ -131,19 +134,20 @@ function Table(){
         krakenWS.onmessage = (event) => {
             var data = JSON.parse(event.data)
             if (Array.isArray(data)){
+                var arr = []
                 data[1].map(d => {
                     var price = parseFloat(d[0])
                     var quantity = parseFloat(d[1])
                     if (price*quantity > 5000){
-                        setTrades(oldArray => {
-                            if (oldArray.length > arrLength){
-                                oldArray.splice(0,25)
-                            }
-                            return [{
-                                exchange: "kraken",time: parseInt(parseFloat(d[2])*1000), type: d.side === "b" ? "BUY" : "SELL", buysell: d.side === "b" ? true : false, 
-                                quantity: quantity, total: formatTotal(quantity * price), price: price}, ...oldArray]
-                        })
+                        arr = [{exchange: "kraken",time: parseInt(parseFloat(d[2])*1000), type: d.side === "b" ? "BUY" : "SELL", 
+                            buysell: d.side === "b" ? true : false, quantity: quantity, total: formatTotal(quantity * price), price: price}, ...arr]
                     }
+                })
+                setTrades(oldArray => {
+                    if (oldArray.length > arrLength){
+                        oldArray.splice(0,25)
+                    }
+                    return [...arr, ...oldArray]
                 })
             }
         }
@@ -185,32 +189,68 @@ function Table(){
     const Row = (props) => {
         var data = props.item.item
         return (
-            <View style={data.buysell ? styles.buyColor : styles.sellColor}>
-                <View style={styles.row}> 
-                    <Text style={[styles.item, styles.buysell]}>{data.type}</Text>
-                    <Text style={[styles.item, styles.price]}>${Number(data.price).toFixed(0)}</Text>
-                    <Text style={[styles.item, styles.btc]}>{data.quantity % 1 != 0 ? parseFloat(data.quantity) : Number(data.quantity).toFixed(0)} BTC</Text>
-                    <Text style={[styles.item, styles.total]}>{data.total}</Text>
-                </View>
+            <View style={styles.row}>
+                <Text style={[data.buysell ? styles.buyColor : styles.sellColor, styles.price]}>{Number(data.price).toFixed(0)}</Text>
+                <Text style={[styles.item, styles.btc]}>{data.quantity % 1 != 0 ? parseFloat(data.quantity) : Number(data.quantity).toFixed(0)} BTC</Text>
+                <Text style={[styles.item, styles.total]}>{data.total}</Text>
+            </View>
+        )
+    }
+
+    const Separator = () => {
+        return <View style={styles.separator} />
+    }
+
+    const Header = () => {
+        return(
+            <View style={styles.header}>
+                <Text style={[styles.item, styles.price]}>Price</Text>
+                <Text style={[styles.item, styles.btc]}>Size</Text>
+                <Text style={[styles.item, styles.total]}>Total</Text>
             </View>
         )
     }
 
     return(
-        <FlatList data={trades} renderItem={r => <Row item={r}/>} />
+        <View style={styles.container}>
+            <FlatList data={trades} 
+                renderItem={r => <Row item={r}/>}
+                ItemSeparatorComponent={Separator}
+                ListHeaderComponent={Header}
+                stickyHeaderIndices={[0]} />
+        </View>
     )
 }
 
 const styles = StyleSheet.create({
+    container: {
+        marginTop: 10,
+        marginBottom: 10,
+	},
+    header:{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#374151",
+        height: 25,
+    },
     row: {
-        marginTop: 5,
-        marginBottom: 5,
+        marginTop: 10,
+        marginBottom: 10,
         display: "flex",
         flexDirection: "row",
         alignItems: "flex-start",
+        justifyContent: "center",
+    },
+    separator: {
+        height: 0.5,
+        width: "100%",
+        backgroundColor: "#374151"
     },
     item: {
         textAlign: "center",
+        color: "#D1D5DB"
     },
     buysell: {
         width: "10%"
@@ -225,15 +265,14 @@ const styles = StyleSheet.create({
         width: "20%"
     },
     buyColor: {
-        borderBottomWidth: 1, 
-        borderBottomColor: "#111827",
-        backgroundColor: "#34D399"
+        color: "#10B981",
+        textAlign: "center",
+
     },
     sellColor:{
-        borderBottomWidth: 1, 
-        borderBottomColor: "#111827",
-        backgroundColor: "#F87171"
-    }
+        color: "#EF4444",
+        textAlign: "center",
+    },
 });
   
 

@@ -2,6 +2,7 @@ import React from "react";
 import { Dimensions } from "react-native";
 import { Svg } from "react-native-svg";
 import { scaleLinear } from "d3-scale";
+import uuid from 'react-native-uuid';
 
 import Candle from "./Candle";
 
@@ -14,10 +15,7 @@ function Chart({ candles, domain }){
     return (
         <Svg width={size} height={size}>
             {candles.map((candle, index) => (
-                <Candle
-                key={candle.date}
-                {...{ candle, index, width, scaleY, scaleBody }}
-                />
+                <Candle key={uuid.v4()}{...{ candle, index, width, scaleY, scaleBody }}/>
             ))}
         </Svg>
     );
