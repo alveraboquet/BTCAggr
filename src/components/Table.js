@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import { View, Text, FlatList, StyleSheet} from 'react-native'
 
-function Table(props){
+function Table(){
 
     let [trades, setTrades] = useState([])
 
