@@ -1,6 +1,6 @@
 # BTCAggr
 
-![screenshot](https://i.imgur.com/ugVbqVB.png)
+![screenshot](https://i.imgur.com/5vHats5.png)
 
 ## Description
 
