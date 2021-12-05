@@ -17,7 +17,7 @@ function Trade(){
 	}
 
 	useEffect(() => {
-		axios.get('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=20')
+		axios.get('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=60')
 		.then(async response => {
 			var data = []
 			var price = 0
